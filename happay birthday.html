@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 Happy Birthday Izza 🎂</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background: radial-gradient(circle at 50% 10%, #3b1a63 0%, #1a0b2e 60%, #0d0518 100%);
+    font-family:'Segoe UI','Poppins',system-ui,sans-serif;
+    display:flex; justify-content:center; align-items:center;
+    padding:16px; position:relative; overflow:hidden;
+  }
+
+  /* Floating background particles */
+  .bg-emoji { position:fixed; bottom:-80px; font-size:28px; pointer-events:none; z-index:0; animation:floatUp linear infinite; opacity:0.7; }
+  @keyframes floatUp { 0%{transform:translateY(0) rotate(0deg); opacity:0;} 10%{opacity:0.8;} 100%{transform:translateY(-110vh) rotate(360deg); opacity:0;} }
+
+  #fireworks-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; display:none; }
+
+  .container {
+    max-width:760px; width:100%; background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:2px solid rgba(255,215,0,0.4); border-radius:56px;
+    padding:32px 26px 44px; box-shadow:0 30px 60px rgba(0,0,0,0.7), 0 0 80px rgba(255,180,50,0.2) inset;
+    position:relative; z-index:10; max-height: 92vh; overflow-y: auto; scroll-behavior: smooth;
+  }
+  .container::-webkit-scrollbar { width: 6px; }
+  .container::-webkit-scrollbar-track { background: transparent; }
+  .container::-webkit-scrollbar-thumb { background: #ffb347; border-radius:10px; }
+
+  .step { display:none; }
+  .step.active { display:block; animation:fadeSlide 0.8s cubic-bezier(.2,.9,.3,1.2); }
+  @keyframes fadeSlide { from{opacity:0; transform:translateY(30px) scale(0.95);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+  /* Interactive Teddy */
+  .teddy-box { display:flex; flex-direction:column; align-items:center; margin:5px 0 15px; cursor: pointer; }
+  .teddy-svg { width:240px; height:auto; filter:drop-shadow(0 0 20px rgba(255,200,80,0.6)) drop-shadow(0 15px 25px rgba(0,0,0,0.8)); transition: transform 0.2s; }
+  .teddy-box:hover .teddy-svg { transform: scale(1.05); }
+  .teddy-jump { animation: jumpAnim 0.6s ease; }
+  @keyframes jumpAnim { 0%{transform:translateY(0);} 30%{transform:translateY(-25px) scale(1.05);} 50%{transform:translateY(0) scale(0.95);} 70%{transform:translateY(-10px);} 100%{transform:translateY(0);} }
+  .flame { animation:flicker .3s infinite alternate; transform-origin:center bottom; }
+  @keyframes flicker { from{opacity:0.7; transform:scaleY(0.9);} to{opacity:1; transform:scaleY(1.15);} }
+
+  .bday-title {
+    font-size:2.5rem; font-weight:900; text-align:center;
+    background:linear-gradient(135deg,#ffe066,#ffb347,#ff7b54,#ffe066); background-size:300% 300%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 20px rgba(255,200,80,0.6)); letter-spacing:2px; line-height:1.15; margin:8px 0 4px;
+    animation:shine 3s linear infinite;
+  }
+  @keyframes shine { 0%{background-position:0% 50%;} 100%{background-position:300% 50%;} }
+  .sub-glow { text-align:center; color:#ffe9a7; font-size:1.1rem; letter-spacing:5px; text-transform:uppercase; margin-bottom:6px; animation:glowPulse 2s ease-in-out infinite alternate; }
+  @keyframes glowPulse { from{text-shadow:0 0 8px rgba(255,215,0,0.4); opacity:0.8;} to{text-shadow:0 0 25px rgba(255,215,0,1); opacity:1;} }
+
+  /* Buttons */
+  .btn-wrapper { display:flex; justify-content:center; width:100%; margin-top:25px; }
+  .next-btn {
+    background:linear-gradient(145deg,#ffe066,#ffb347); border:none; padding:16px 45px; border-radius:60px;
+    font-size:1.3rem; font-weight:800; color:#1e0e2e; display:inline-flex; align-items:center; gap:12px;
+    cursor:pointer; letter-spacing:1px; box-shadow:0 8px 0 #9b6b1f, 0 15px 30px rgba(0,0,0,0.4);
+    transition:all .1s ease; position:relative; overflow:hidden;
+  }
+  .next-btn::after { content:""; position:absolute; top:0; left:-120%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.7),transparent); transform:skewX(-20deg); animation:btnShine 2s infinite; }
+  @keyframes btnShine { 0%{left:-120%;} 60%{left:150%;} 100%{left:150%;} }
+  .next-btn:active { transform:translateY(6px); box-shadow:0 2px 0 #9b6b1f, 0 10px 20px rgba(0,0,0,0.4); }
+
+  /* Magic Envelope */
+  .envelope-wrapper { position:relative; width:100%; max-width: 320px; height: 200px; margin: 30px auto; cursor: pointer; perspective: 1000px; }
+  .envelope { position: relative; width: 100%; height: 100%; background: #fceabb; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; transition: transform 0.4s; }
+  .envelope-wrapper:hover .envelope { transform: scale(1.03); }
+  .envelope::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8b500; clip-path: polygon(0 0, 50% 50%, 100% 0); z-index: 3; transition: transform 0.6s; transform-origin: top; }
+  .envelope.open::before { transform: rotateX(180deg); z-index: 0; }
+  .envelope .letter { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; background: #fff8e7; border-radius: 8px; padding: 20px; z-index: 2; transform: translateY(100%); transition: transform 0.6s; }
+  .envelope.open .letter { transform: translateY(0); }
+  .envelope .letter p { font-size: 1rem; color: #1e0e2e; line-height: 1.5; font-weight: 500; }
+
+  .envelope .heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; z-index: 4; animation: beat 1.5s infinite; }
+  @keyframes beat { 0%,100%{transform: translate(-50%, -50%) scale(1);} 50%{transform: translate(-50%, -50%) scale(1.2);} }
+
+  /* Message Cards */
+  .message-bubble {
+    background: linear-gradient(145deg, rgba(255,248,231,0.98), rgba(255,235,200,0.95));
+    padding:28px 24px; border-radius:30px; margin:16px 0;
+    color:#1e0e2e; font-size:1.15rem; line-height:1.7;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(255,215,0,0.3) inset;
+    border-left:8px solid #ffb347; text-align:left; animation:bubblePop .8s cubic-bezier(.2,.9,.3,1.3);
+  }
+  @keyframes bubblePop { from{opacity:0; transform:scale(0.9) translateY(20px);} to{opacity:1; transform:scale(1) translateY(0);} }
+  .message-bubble p + p { margin-top: 12px; }
+  .highlight { background: linear-gradient(120deg, #ffe9a7 0%, #ffe9a7 40%, transparent 80%); padding: 0 4px; font-weight: 600; }
+
+  .final-hearts { text-align:center; font-size:2.2rem; letter-spacing:10px; margin-top:30px; animation:heartBeat 1.2s infinite; }
+  @keyframes heartBeat { 0%,100%{transform:scale(1);} 25%{transform:scale(1.1);} 50%{transform:scale(1);} 75%{transform:scale(1.15);} }
+  .signature { text-align:center; color:#ffe9a7; margin-top:20px; font-weight:400; letter-spacing:2px; font-size: 1.1rem; }
+
+  @media (max-width:520px) {
+    .container { padding:22px 16px 32px; border-radius:40px; }
+    .bday-title { font-size:1.9rem; }
+    .teddy-svg { width:180px; }
+    .next-btn { padding:14px 30px; font-size:1.1rem; }
+    .message-bubble { font-size:1rem; padding:20px; }
+    .envelope-wrapper { max-width: 260px; height: 170px; }
+    .envelope .letter p { font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fireworks-canvas"></canvas>
+
+<div class="container" id="mainContainer">
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <div class="teddy-box" id="teddyBox">
+      <svg class="teddy-svg" viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="105" cy="62" r="27" fill="#8B5A2B"/><circle cx="105" cy="62" r="17" fill="#D2B48C"/>
+        <circle cx="195" cy="62" r="27" fill="#8B5A2B"/><circle cx="195" cy="62" r="17" fill="#D2B48C"/>
+        <circle cx="150" cy="195" r="76" fill="#8B5A2B"/><circle cx="150" cy="195" r="64" fill="#A0522D"/>
+        <ellipse cx="112" cy="268" rx="30" ry="20" fill="#8B5A2B"/><ellipse cx="188" cy="268" rx="30" ry="20" fill="#8B5A2B"/>
+        <ellipse cx="112" cy="268" rx="21" ry="13" fill="#D2B48C"/><ellipse cx="188" cy="268" rx="21" ry="13" fill="#D2B48C"/>
+        <circle cx="150" cy="100" r="48" fill="#A0522D"/>
+        <circle cx="117" cy="110" r="10" fill="#E59866" opacity="0.55"/><circle cx="183" cy="110" r="10" fill="#E59866" opacity="0.55"/>
+        <circle cx="132" cy="92" r="8" fill="#1e0e2e"/><circle cx="168" cy="92" r="8" fill="#1e0e2e"/>
+        <circle cx="134.5" cy="89.5" r="2.8" fill="white"/><circle cx="170.5" cy="89.5" r="2.8" fill="white"/>
+        <ellipse cx="150" cy="109" rx="11" ry="7.5" fill="#3E2723"/>
+        <path d="M144 120 Q150 128 156 120" stroke="#3E2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="88" cy="192" rx="26" ry="19" fill="#A0522D" transform="rotate(-22 88 192)"/>
+        <ellipse cx="212" cy="192" rx="26" ry="19" fill="#A0522D" transform="rotate(22 212 192)"/>
+        <rect x="104" y="168" width="92" height="52" rx="12" fill="#F5DEB3"/><rect x="104" y="168" width="92" height="20" rx="10" fill="#FF69B4"/>
+        <circle cx="118" cy="188" r="5" fill="#FF69B4"/><circle cx="140" cy="190" r="4.5" fill="#FF69B4"/><circle cx="162" cy="190" r="4.5" fill="#FF69B4"/><circle cx="184" cy="188" r="5" fill="#FF69B4"/>
+        <rect x="128" y="146" width="7" height="24" rx="3" fill="#FFD700"/><rect x="146" y="140" width="7" height="30" rx="3" fill="#FFD700"/><rect x="164" y="146" width="7" height="24" rx="3" fill="#FFD700"/>
+        <ellipse class="flame" cx="131.5" cy="138" rx="6.5" ry="9" fill="#FF8C00"/><ellipse class="flame" cx="149.5" cy="132" rx="6.5" ry="9" fill="#FF8C00"/><ellipse class="flame" cx="167.5" cy="138" rx="6.5" ry="9" fill="#FF8C00"/>
+        <ellipse cx="131.5" cy="140" rx="3" ry="4.5" fill="#FFE066"/><ellipse cx="149.5" cy="134" rx="3" ry="4.5" fill="#FFE066"/><ellipse cx="167.5" cy="140" rx="3" ry="4.5" fill="#FFE066"/>
+      </svg>
+    </div>
+    <h1 class="bday-title">🎉 HAPPY BIRTHDAY IZZA 🎉</h1>
+    <div class="sub-glow">✨ my best friend ✨</div>
+    <p style="text-align:center; color:#fff; margin-top:10px; font-size:0.9rem; opacity:0.8;">(Tap the teddy bear for a surprise! 🧸)</p>
+    <div class="btn-wrapper">
+      <button class="next-btn" id="next1">Next <span>➡️</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <h1 class="bday-title" style="font-size:2.1rem;">🎆 FIREWORKS FOR YOU 🎆</h1>
+    <p style="color:#ffe9a7;text-align:center;font-size:1.2rem;margin:18px 0 6px;">Look up, Izza — the sky is celebrating you! ✨</p>
+    <div style="text-align:center;font-size:3rem;margin:12px 0; animation: floatUp 3s infinite alternate;">🎇 🎆 🎇</div>
+    <div class="btn-wrapper">
+      <button class="next-btn" id="next2">Next <span>➡️</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <h1 class="bday-title" style="font-size:1.8rem; margin-bottom:20px;">💌 A Special Letter</h1>
+    
+    <div class="envelope-wrapper" id="envelopeWrapper">
+      <div class="envelope" id="envelope">
+        <div class="letter">
+          <p id="typeTarget"></p>
+        </div>
+        <div class="heart">❤️</div>
+      </div>
+    </div>
+
+    <div class="btn-wrapper" id="next3Wrapper" style="opacity:0; pointer-events:none; transition: 0.5s;">
+      <button class="next-btn" id="next3">Next <span>➡️</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="step4">
+    <div class="message-bubble">
+      <p>May this birthday mark the beginning of a fantastic journey that leads you to an even more amazing future. Keep inspiring us. <span class="highlight">Happy Birthday!</span> 🌟</p>
+    </div>
+    <div class="btn-wrapper">
+      <button class="next-btn" id="next4">Next <span>➡️</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" id="step5">
+    <div class="message-bubble">
+      <p><span class="highlight">Happy Birthday meri senior saahiba!</span> 🎂🥳</p>
+      <p>Sirf 24 ghante (1 day) bari ho, lekin roab poore saal ka jhaadti ho! 😜 Mazaaq se hat kar, tum meri cousin baad mein ho, pehle meri sabse achhi dost ho. Bachpan se lekar aaj tak meri har pagal-panti mein mera saath dene ke liye thank you. Allah kare ye naya saal tumhare liye dher saari khushiyan laye! Happy Birthday! 🎈✨</p>
+    </div>
+    <div class="btn-wrapper">
+      <button class="next-btn" id="next5">Next <span>➡️</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step" id="step6">
+    <div class="message-bubble">
+      <p>Ek din bari ho kar tumne mujh par jo ehsan kiya hai na, wo main kabhi nahi bhool sakti! 😜 Bachpan se lekar aaj tak tumne jitne mere raaz chupaye hain aur jitni meri daant bachai hai, uske liye tumhein <span class="highlight">21 topon ki salaami!</span></p>
+      <p>Tum mere bachpan ki wo galti ho jisse mujhe aaj bhi pyar hai! 🙈 Have an awesome birthday, partner-in-crime! ❤️</p>
+    </div>
+    <div class="btn-wrapper">
+      <button class="next-btn" id="next6">Next <span>➡️</span></button>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step" id="step7">
+    <div class="message-bubble">
+      <p>Ek din bari ho kar tumne mujh par jo ehsan kiya hai na, wo main kabhi nahi bhool sakti! 😜 Bachpan se lekar aaj tak tumne jitne mere raaz chupaye hain aur jitni meri daant bachai hai, uske liye tumhein <span class="highlight">21 topon ki salaami!</span></p>
+      <p>Tum mere bachpan ki wo galti ho jisse mujhe aaj bhi pyar hai! 🙈 Have an awesome birthday, partner-in-crime! ❤️</p>
+    </div>
+    <div class="final-hearts">🎂 🎈 ❤️ ✨ 🎉</div>
+    <div class="signature">— with all my love, your best friend —</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // Floating Background
+  const bgEmojis = ['💖','🎈','✨','🎂','🌟','💫','🎉','🌸','💝','⭐'];
+  function spawnBgEmoji(){
+    const el = document.createElement('div');
+    el.className = 'bg-emoji';
+    el.textContent = bgEmojis[Math.floor(Math.random()*bgEmojis.length)];
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.fontSize = (16 + Math.random()*24) + 'px';
+    const dur = 8 + Math.random()*10;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay = Math.random()*3 + 's';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), (dur+5)*1000);
+  }
+  setInterval(spawnBgEmoji, 500);
+  for(let i=0;i<6;i++) setTimeout(spawnBgEmoji, i*200);
+
+  const steps = {
+    1:document.getElementById('step1'),
+    2:document.getElementById('step2'),
+    3:document.getElementById('step3'),
+    4:document.getElementById('step4'),
+    5:document.getElementById('step5'),
+    6:document.getElementById('step6'),
+    7:document.getElementById('step7')
+  };
+  
+  const canvas = document.getElementById('fireworks-canvas');
+  const ctx = canvas.getContext('2d');
+  
+  const teddyBox = document.getElementById('teddyBox');
+  const envelopeWrapper = document.getElementById('envelopeWrapper');
+  const envelope = document.getElementById('envelope');
+  const typeTarget = document.getElementById('typeTarget');
+  const next3Wrapper = document.getElementById('next3Wrapper');
+
+  const FULL_LETTER = "On this special day, may you be gifted with life's biggest joys and never-ending bliss. Remember, you are capable of achieving anything you put your mind to. Happy Birthday!";
+  let typeTimer = null;
+  let envelopeOpened = false;
+
+  function showStep(n){
+    Object.values(steps).forEach(s=>s.classList.remove('active'));
+    steps[n].classList.add('active');
+    document.getElementById('mainContainer').scrollTo({top: 0, behavior: 'smooth'});
+    
+    if(n === 2){ canvas.style.display = 'block'; startFireworks(); } 
+    else { canvas.style.display = 'none'; stopFireworks(); }
+  }
+
+  // Teddy Surprise
+  teddyBox.addEventListener('click', () => {
+    const svg = teddyBox.querySelector('svg');
+    svg.classList.add('teddy-jump');
+    setTimeout(() => svg.classList.remove('teddy-jump'), 600);
+    // Little burst of hearts
+    for(let i=0; i<8; i++) {
+        const heart = document.createElement('div');
+        heart.textContent = '❤️';
+        heart.style.position = 'fixed';
+        heart.style.left = (window.innerWidth/2 + (Math.random()-0.5)*100) + 'px';
+        heart.style.top = (window.innerHeight/2 + (Math.random()-0.5)*100) + 'px';
+        heart.style.fontSize = '20px';
+        heart.style.pointerEvents = 'none';
+        heart.style.zIndex = '999';
+        heart.style.transition = 'all 0.8s ease-out';
+        document.body.appendChild(heart);
+        setTimeout(() => {
+            heart.style.transform = `translate(${(Math.random()-0.5)*200}px, -200px) scale(0)`;
+            heart.style.opacity = '0';
+        }, 10);
+        setTimeout(() => heart.remove(), 900);
+    }
+  });
+
+  // Envelope Logic
+  envelopeWrapper.addEventListener('click', () => {
+    if(envelopeOpened) return;
+    envelopeOpened = true;
+    envelope.classList.add('open');
+    
+    // Wait for flap to open, then start typing
+    setTimeout(() => {
+      typeTarget.textContent = '';
+      let i = 0;
+      typeTimer = setInterval(() => {
+        if(i < FULL_LETTER.length) {
+          typeTarget.textContent += FULL_LETTER.charAt(i);
+          i++;
+        } else {
+          clearInterval(typeTimer);
+          next3Wrapper.style.opacity = '1';
+          next3Wrapper.style.pointerEvents = 'auto';
+        }
+      }, 30);
+    }, 500);
+  });
+
+  // Buttons
+  document.getElementById('next1').addEventListener('click', ()=>showStep(2));
+  document.getElementById('next2').addEventListener('click', ()=>showStep(3));
+  document.getElementById('next3').addEventListener('click', ()=>showStep(4));
+  document.getElementById('next4').addEventListener('click', ()=>showStep(5));
+  document.getElementById('next5').addEventListener('click', ()=>showStep(6));
+  document.getElementById('next6').addEventListener('click', ()=>showStep(7));
+
+  // Fireworks Engine
+  let particles = [], rafId = null, lastLaunch = 0, confetti = [], running = false;
+  function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+  function makeParticle(x,y,color){
+    const angle = Math.random()*Math.PI*2; const speed = Math.random()*7 + 2;
+    return { x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, life: 1, decay: 0.008 + Math.random()*0.015, color, size: Math.random()*3.5 + 1.5 };
+  }
+
+  function makeConfetti(){
+    const colors = ['#ffd966','#ff7b54','#ff69b4','#7ee8fa','#b388ff','#a8ff78'];
+    return { x: Math.random()*canvas.width, y: -20, vx: (Math.random()-0.5)*2, vy: Math.random()*3 + 2, life: 1, decay: 0.003, color: colors[Math.floor(Math.random()*colors.length)], size: Math.random()*8 + 4, rot: Math.random()*Math.PI, rotSpeed: (Math.random()-0.5)*0.2 };
+  }
+
+  function launchFirework(){
+    const x = Math.random()*canvas.width*0.8 + canvas.width*0.1;
+    const y = Math.random()*canvas.height*0.4 + canvas.height*0.1;
+    const hue = Math.random()*360;
+    for(let i=0;i<70;i++) particles.push(makeParticle(x,y,`hsl(${hue},100%,65%)`));
+    for(let i=0;i<20;i++) particles.push(makeParticle(x,y,`hsl(${hue+Math.random()*60},100%,80%)`));
+    if(Math.random()<0.8){
+      for(let i=0;i<30;i++){ const conf = makeConfetti(); conf.x = x + (Math.random()-0.5)*50; conf.y = y + (Math.random()-0.5)*50; conf.vy = Math.random()*4 + 1; confetti.push(conf); }
+    }
+  }
+
+  function drawLoop(){
+    if(!running) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    
+    for(let i=particles.length-1;i>=0;i--){
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.vx *= 0.985; p.vy *= 0.985; p.life -= p.decay; p.size *= 0.995;
+      if(p.life <= 0.02 || p.size < 0.4){ particles.splice(i,1); continue; }
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = 15; ctx.globalAlpha = Math.min(p.life*1.5, 1); ctx.fill(); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    }
+    
+    for(let i=confetti.length-1;i>=0;i--){
+      const c = confetti[i]; c.x += c.vx; c.y += c.vy; c.vy += 0.04; c.rot += c.rotSpeed; c.life -= c.decay;
+      if(c.life <= 0.05 || c.y > canvas.height+30){ confetti.splice(i,1); continue; }
+      ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rot); ctx.fillStyle = c.color; ctx.globalAlpha = Math.min(c.life*1.5, 1); ctx.fillRect(-c.size/2, -c.size/4, c.size, c.size/2); ctx.restore(); ctx.globalAlpha = 1;
+    }
+    
+    const now = Date.now();
+    if(now - lastLaunch > 400 && particles.length < 800){ launchFirework(); lastLaunch = now; }
+    if(now - lastLaunch > 200 && confetti.length < 250 && Math.random() < 0.6){ confetti.push(makeConfetti()); }
+    
+    rafId = requestAnimationFrame(drawLoop);
+  }
+
+  function startFireworks(){
+    if(running) return;
+    running = true; lastLaunch = Date.now() - 1000;
+    for(let i=0;i<4;i++) setTimeout(launchFirework, i*150);
+    for(let i=0;i<40;i++){ const c = makeConfetti(); c.y = Math.random()*canvas.height; confetti.push(c); }
+    drawLoop();
+  }
+
+  function stopFireworks(){
+    running = false;
+    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+    particles = []; confetti = []; ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+
+  canvas.style.display = 'none';
+})();
+</script>
+</body>
+</html>
